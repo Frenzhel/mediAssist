@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Health RAG Chatbot</title>
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <style>
+        /* Smooth scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #9ca3af;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-100 flex flex-col h-screen">
+
+    <!-- Header -->
+    <header class="bg-blue-700 text-white p-4 shadow-lg">
+        <h1 class="text-2xl font-bold text-center">
+            DOH / WHO Health Information Chatbot
+        </h1>
+    </header>
+
+    <!-- Chat Container -->
+    <main id="chatbox" class="flex-1 overflow-y-auto p-4 space-y-4">
+        <!-- Messages will be appended here -->
+    </main>
+
+    <!-- Input Area -->
+    <footer class="bg-white p-4 shadow-lg flex items-center space-x-3">
+        <input
+            id="userInput"
+            type="text"
+            placeholder="Ask a health-related question..."
+            class="flex-1 border rounded-lg px-4 py-3 focus:ring-2 focus:ring-blue-500 outline-none"
+        />
+
+        <button
+            onclick="sendMessage()"
+            class="bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white px-5 py-3 rounded-lg font-semibold shadow"
+        >
+            Send
+        </button>
+    </footer>
+
+    <script>
+        const chatbox = document.getElementById("chatbox");
+        const userInput = document.getElementById("userInput");
+
+        function appendMessage(text, sender) {
+            const bubble = document.createElement("div");
+            bubble.className =
+                sender === "user"
+                    ? "bg-blue-600 text-white self-end max-w-xl ml-auto p-3 rounded-xl shadow"
+                    : "bg-white text-gray-800 max-w-xl p-3 rounded-xl shadow border";
+
+            bubble.innerHTML = `<p class="leading-relaxed whitespace-pre-line">${text}</p>`;
+            chatbox.appendChild(bubble);
+            chatbox.scrollTop = chatbox.scrollHeight;
+        }
+
+        function appendLoading() {
+            const loading = document.createElement("div");
+            loading.id = "loadingIndicator";
+            loading.className = "text-gray-500 italic";
+            loading.innerText = "Thinking...";
+            chatbox.appendChild(loading);
+            chatbox.scrollTop = chatbox.scrollHeight;
+        }
+
+        function removeLoading() {
+            const loading = document.getElementById("loadingIndicator");
+            if (loading) loading.remove();
+        }
+
+        async function sendMessage() {
+            const text = userInput.value.trim();
+            if (text === "") return;
+
+            appendMessage(text, "user");
+            userInput.value = "";
+
+            appendLoading();
+
+            try {
+                const response = await fetch("http://localhost:8000/chat", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ question: text }),
+                });
+
+                const data = await response.json();
+                removeLoading();
+
+                if (data.answer) {
+                    // Format citation sources
+                    let sourcesText = "";
+                    if (data.sources?.length > 0) {
+                        sourcesText =
+                            "\n\nSources:\n" +
+                            data.sources
+                                .map(
+                                    (s) =>
+                                        `• ${s.source} (page ${s.page})`
+                                )
+                                .join("\n");
+                    }
+
+                    appendMessage(data.answer + sourcesText, "bot");
+                } else {
+                    appendMessage("⚠ No response from the server.", "bot");
+                }
+            } catch (err) {
+                removeLoading();
+                appendMessage("⚠ Error connecting to chatbot backend.", "bot");
+            }
+        }
+
+        // Allow Enter key to send message
+        userInput.addEventListener("keypress", function (e) {
+            if (e.key === "Enter") sendMessage();
+        });
+    </script>
+</body>
+</html>
