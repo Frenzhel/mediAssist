@@ -1,0 +1,33 @@
+# PDF files
+data/
+
+# Python venv
+venv/
+.env
+__pycache__/
+*.pyc
+
+# ChromaDB vector storage
+vector_db/
+*.duckdb
+*.parquet
+
+# IDE junk
+.vscode/
+.idea/
+
+# OS junk
+Thumbs.db
+.DS_Store
+
+# Build stuff
+dist/
+build/
+
+# Model files or large blobs
+*.dll
+*.so
+*.bin
+*.pt
+*.ckpt
+*.onnx

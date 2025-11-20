@@ -9,9 +9,11 @@ class TextChunker:
 
         chunks = []
         start = 0
+
         while start < len(text):
             end = start + self.size
             chunk = text[start:end]
             chunks.append(chunk.strip())
             start = end - self.overlap
+
         return chunks
