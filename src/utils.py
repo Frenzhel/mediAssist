@@ -1,8 +1,4 @@
 def build_prompt(docs, metas, question):
-    """
-    Build a simple system + context + question prompt.
-    Keeps the style taught in class (cite filename + page).
-    """
     context = ""
     for d, m in zip(docs, metas):
         context += f"[{m.get('source','unknown')} - page {m.get('page','?')}]\n{d}\n\n"

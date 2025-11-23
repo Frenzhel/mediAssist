@@ -1,8 +1,3 @@
-"""
-ingest_docs.py
-Ingest all PDFs under ./data into Chroma using Embedder from embedder.py.
-"""
-
 import os
 from dotenv import load_dotenv
 load_dotenv()
@@ -47,11 +42,9 @@ def ingest_all():
 
     print(f"Total chunks to embed: {len(docs)}")
     embeddings = embedder.embed(all_texts_for_embedding)
-    # embeddings is a list/np array aligned with docs
 
     print("Saving to vector database...")
     store.add(ids=ids, documents=docs, metadatas=metas, embeddings=embeddings)
-    # persist is handled by PersistentClient, but call close for safety
     store.close()
     print("Ingestion complete.")
 

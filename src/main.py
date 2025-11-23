@@ -1,11 +1,6 @@
-"""
-main.py
-FastAPI entrypoint. Uses the same simple API your professor taught (POST /chat).
-"""
-
 import os
 from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware   # <-- YOU FORGOT THIS
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from dotenv import load_dotenv
 
@@ -21,7 +16,6 @@ class Query(BaseModel):
 
 app = FastAPI(title="Health RAG Chatbot")
 
-# ---- CORS SECTION ----
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -30,7 +24,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# ---- COMPONENT INITIALIZATION ----
 VECTOR_DIR = os.getenv("CHROMA_DIR", "./vector_db")
 retriever = VectorStore(VECTOR_DIR)
 embedder = Embedder()

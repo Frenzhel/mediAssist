@@ -20,7 +20,6 @@ class LLM:
         r.raise_for_status()
         data = r.json()
 
-        # Supports older and newer Ollama formats
         if "response" in data:
             return data["response"]
 
