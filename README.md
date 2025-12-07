@@ -13,6 +13,6 @@ Ingest the data:
 python src/ingest_docs.py
 
 Run program:
-uvicorn src.main:app --reload --port 8000
+uvicorn src.main:app --reload --port 8080
 
 Open index.html to run chatbot

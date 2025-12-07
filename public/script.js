@@ -13,10 +13,23 @@ function appendMessage(sender, text) {
     ? "bg-blue-600 text-white p-3 rounded-lg mb-2 self-end max-w-[80%] ml-auto"
     : "bg-gray-200 text-gray-900 p-3 rounded-lg mb-2 max-w-[80%]";
 
-  bubble.textContent = text;
+  // escape HTML to prevent XSS
+  let safe = text
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+
+  // convert newlines to <br>
+  safe = safe.replace(/\n/g, "<br>");
+
+  // pretty bullet points
+  safe = safe.replace(/•/g, "<span class='ml-4'>•</span>");
+
+  bubble.innerHTML = safe;
   chatbox.appendChild(bubble);
   chatbox.scrollTop = chatbox.scrollHeight;
 }
+
 
 async function sendMessage() {
   const text = userInput.value.trim();
@@ -33,7 +46,7 @@ async function sendMessage() {
   chatbox.scrollTop = chatbox.scrollHeight;
 
   try {
-    const res = await fetch("http://127.0.0.1:8000/chat", {
+    const res = await fetch("http://127.0.0.1:8080/chat", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ question: text })
